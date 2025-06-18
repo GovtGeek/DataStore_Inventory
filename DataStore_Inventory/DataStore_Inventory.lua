@@ -17,6 +17,7 @@ local GetAverageItemLevel, GetInventoryItemLink, GetItemInfo, GetItemInfoInstant
 local C_TransmogCollection, C_TransmogSets = C_TransmogCollection, C_TransmogSets
 
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
+local isMists = LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_LEVEL_MISTS_OF_PANDARIA
 
 local L = DataStore:GetLocale(addonName)
 local bit64 = LibStub("LibBit64")
@@ -45,7 +46,6 @@ local function ScanAverageItemLevel()
 
 	-- GetAverageItemLevel only exists in retail
 	if type(GetAverageItemLevel) == "function" then
-
 		local overallAiL, AiL = GetAverageItemLevel()
 		if overallAiL and AiL and overallAiL > 0 and AiL > 0 then
 			char.overallAIL = overallAiL
@@ -377,11 +377,12 @@ DataStore:OnAddonLoaded(addonName, function()
 end)
 
 DataStore:OnPlayerLogin(function()
+	addon:ListenTo("PLAYER_ENTERING_WORLD", OnPlayerAlive)
 	addon:ListenTo("PLAYER_ALIVE", OnPlayerAlive)
 	addon:ListenTo("PLAYER_EQUIPMENT_CHANGED", OnPlayerEquipmentChanged)
 	
-	if isRetail then
-		-- addon:ListenTo("PLAYER_AVG_ITEM_LEVEL_READY", OnPlayerAilReady)
+	if isRetail or isMists then
+		addon:ListenTo("PLAYER_AVG_ITEM_LEVEL_UPDATE", OnPlayerAilReady)
 		-- addon:ListenTo("TRANSMOG_COLLECTION_LOADED", OnTransmogCollectionLoaded)
 		addon:ListenTo("TRANSMOG_COLLECTION_UPDATED", OnTransmogCollectionUpdated)
 	else
