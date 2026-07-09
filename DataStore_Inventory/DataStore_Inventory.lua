@@ -23,7 +23,10 @@ local bit64 = LibStub("LibBit64")
 
 
 -- *** Utility functions ***
-local NUM_EQUIPMENT_SLOTS = 30			-- 30 slots when counting the new profession tools added in 10.0
+local NUM_EQUIPMENT_SLOTS = 19			-- 19 slots prior to 10.0
+if isRetail then
+	NUM_EQUIPMENT_SLOTS = 30			-- 30 slots when counting the new profession tools added in 10.0
+end
 
 local function IsEnchanted(link)
 	if not link then return end
@@ -302,18 +305,18 @@ end
 local function OnPlayerAlive()
 	ScanInventory()
 	ScanAverageItemLevel()
-	
+
 	if isRetail then
 		ScanTransmogSets()
-
-		-- Scan again after 5 seconds, no less, to ensure that item info has been properly updated.
-		C_Timer.After(5, ScanInventory)
 	end
+	-- Scan again after 5 seconds, no less, to ensure that item info has been properly updated.
+	--C_Timer.After(5, ScanInventory)
+	C_Timer.After(3, ScanInventory) -- Try 3 seconds after
 end
 
 local function OnPlayerEquipmentChanged(event, slot)
-	-- ScanInventorySlot(slot)
-	ScanInventory()
+	ScanInventorySlot(slot)
+	--ScanInventory()
 	ScanAverageItemLevel()
 	thisCharacter.lastUpdate = time()
 end
